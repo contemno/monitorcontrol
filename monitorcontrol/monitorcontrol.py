@@ -39,6 +39,16 @@ class PowerMode(enum.Enum):
 
 
 @enum.unique
+class AudioMuteMode(enum.Enum):
+    """Monitor audio mute modes."""
+
+    #: On.
+    on = 0x01
+    #: Off.
+    off = 0x02
+
+
+@enum.unique
 class InputSource(enum.Enum):
     """Monitor input sources."""
 
@@ -260,6 +270,51 @@ class Monitor:
         code = vcp.VCPCode("image_luminance")
         self._set_vcp_feature(code, value)
 
+    def get_volume(self) -> int:
+        """
+        Gets the monitors sound volume level.
+
+        Returns:
+            Current sound volume value.
+
+        Example:
+            Basic Usage::
+
+                from monitorcontrol import get_monitors
+
+                for monitor in get_monitors():
+                    with monitor:
+                        print(monitor.get_volume())
+
+        Raises:
+            VCPError: Failed to get sound volume from the VCP.
+        """
+        code = vcp.VCPCode("sound_volume")
+        return self._get_vcp_feature(code)
+
+    def set_volume(self, value: int):
+        """
+        Sets the monitors set_volume level.
+
+        Args:
+            value: New set_volume value (typically 0-100).
+
+        Example:
+            Basic Usage::
+
+                from monitorcontrol import get_monitors
+
+                for monitor in get_monitors():
+                    with monitor:
+                        monitor.set_volume(50)
+
+        Raises:
+            ValueError: Luminance outside of valid range.
+            VCPError: Failed to set sound volume in the VCP.
+        """
+        code = vcp.VCPCode("sound_volume")
+        self._set_vcp_feature(code, value)
+
     def get_color_preset(self) -> int:
         """
         Gets the monitors color preset.
@@ -424,6 +479,67 @@ class Monitor:
             raise TypeError("unsupported mode type: " + repr(type(value)))
 
         code = vcp.VCPCode("display_power_mode")
+        self._set_vcp_feature(code, mode_value)
+
+    def get_audio_mute_mode(self) -> AudioMuteMode:
+        """
+        Get the monitor audio mute mode.
+
+        Returns:
+            Value from the :py:class:`AudioMuteMode` enumeration.
+
+        Example:
+            Basic Usage::
+
+                from monitorcontrol import get_monitors
+
+                for monitor in get_monitors():
+                    with monitor:
+                        print(monitor.get_audio_mute_mode())
+
+        Raises:
+            VCPError: Failed to get the audio mute mode.
+            ValueError: Set audio mute state outside of valid range.
+            KeyError: Set audio mute mode string is invalid.
+        """
+        code = vcp.VCPCode("display_audio_mute_mode")
+        value = self._get_vcp_feature(code)
+        return AudioMuteMode(value)
+
+    def set_audio_mute_mode(self, value: Union[int, str, AudioMuteMode]):
+        """
+        Set the monitor audio mute mode.
+
+        Args:
+            value:
+                An integer audio mute mode,
+                or a string representing the audio mute mode,
+                or a value from :py:class:`AudioMuteMode`.
+
+        Example:
+            Basic Usage::
+
+                from monitorcontrol import get_monitors
+
+                for monitor in get_monitors():
+                    with monitor:
+                        monitor.set_audio_mute_mode("standby")
+
+        Raises:
+            VCPError: Failed to get or set the audio mute mode
+            ValueError: audio mute state outside of valid range.
+            AttributeError: audio mute mode string is invalid.
+        """
+        if isinstance(value, str):
+            mode_value = getattr(AudioMuteMode, value).value
+        elif isinstance(value, int):
+            mode_value = AudioMuteMode(value).value
+        elif isinstance(value, AudioMuteMode):
+            mode_value = value.value
+        else:
+            raise TypeError("unsupported mode type: " + repr(type(value)))
+
+        code = vcp.VCPCode("display_audio_mute_mode")
         self._set_vcp_feature(code, mode_value)
 
     def get_input_source(self) -> InputSource:
