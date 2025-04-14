@@ -4,6 +4,7 @@ from .monitorcontrol import (  # noqa: F401
     get_monitors,
     Monitor,
     PowerMode,
+    AudioMuteMode,
     InputSource,
     ColorPreset,
 )

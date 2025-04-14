@@ -16,6 +16,12 @@ _VCP_CODE_DEFINTIONS = {
         "type": "rw",
         "function": "c",
     },
+    "sound_volume": {
+        "name": "sound volume",
+        "value": 0x62,
+        "type": "rw",
+        "function": "c",
+    },
     "image_contrast": {
         "name": "image contrast",
         "value": 0x12,
@@ -49,6 +55,12 @@ _VCP_CODE_DEFINTIONS = {
     "display_power_mode": {
         "name": "display power mode",
         "value": 0xD6,
+        "type": "rw",
+        "function": "nc",
+    },
+    "display_audio_mute_mode": {
+        "name": "display audio mute mode",
+        "value": 0x8D,
         "type": "rw",
         "function": "nc",
     },
